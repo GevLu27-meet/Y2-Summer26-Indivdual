@@ -27,6 +27,7 @@ def run_chat():
 
     print('Trui: Hello! I am Trui, your friendly language instructor. How can I help you today?')
     while True:
+        history = load_history()
         user_input = input('>> ')
 
         if user_input.lower() == 'exit':
