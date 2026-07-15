@@ -25,6 +25,8 @@ def run_chat():
     """
     history = []
 
+    TotalTokens = 0
+
     print('Trui: Hello! I am Trui, your friendly language instructor. How can I help you today?')
     while True:
         user_input = input('>> ')
@@ -36,14 +38,19 @@ def run_chat():
             print('Trui: Conversation reset.')
             continue
         history.append({'role': 'user', 'content': user_input})
-        TotalTokens = 0
-        response = client.messages.create(
-            model='claude-haiku-4-5-20251001',
-            max_tokens=300, # how much words/effort are you willing to pay for this.
-            temperature=0.7, # the lvl from 0 to 1 of predictability and creativity.
-            system=system_message,
-            messages=history
-        )
+        try:
+            response = client.messages.create(
+                model='claude-haiku-4-5-20251001',
+                max_tokens=300, # how much words/effort are you willing to pay for this.
+                temperature=0.7, # the lvl from 0 to 1 of predictability and creativity.
+                system=system_message,
+                messages=history
+            )
+
+
+        except Exception as e:
+            print("Error:", e)
+            continue
         TotalTokens += response.usage.input_tokens + response.usage.output_tokens
         
         reply = response.content[0].text
@@ -56,7 +63,9 @@ def run_chat():
 
 run_chat()
 
-
+# Step 3:
+# 1. It does remember and stay in the role.
+# 2. When I ask a message outside its scope it says it can't answer it
 # --------------------------------
 # ----------Reflection------------
 # --------------------------------
@@ -66,19 +75,19 @@ run_chat()
 # Delete:
 # system=system_message
 # I think that the chatbot would just function without any name or rules and by claude's default
-# What happened was, that
+# The chatbot will still work normally, but it will lose the custom instructions you gave it.
 #
 # Always try to help when you can, and *be honest if you can or not*.
 # I thin it would just not follow it and won't be honest if he can answer or not and just lie
-# What happened was, that
+# The chatbot will still answer questions, because Claude already has general helpfulness and honesty behavior from its training.
 # 
 # model = ...
 # I think there would be an error and it wouldn't know what to used
-# What happened was, that
+# The API requires a specific model name. Without a valid model parameter, the request would fail because Anthropic would not know which AI model should process the message.
+# TypeError: messages.create() missing required argument: model
 #
 # Bug diary:
 # Error 400: anthropic.BadRequestError
 # I persome that the problem is in the key itself and out of tokens.
 # I was right
 # no gap
-# 

@@ -11,6 +11,8 @@ def run_chat():
     system_message = "Your name is Trui. You are a friendly assistant who always lies to students about anything unless it's obvious. You explain things convincingly and complicated and ou always lie but without being obvious"
     history = []
 
+    TotalTokens = 0
+
     print('Trui: Hello! I am Trui, your friendly assistant. How can I help you today?')
     while True:
         user_input = input('>> ')
@@ -27,14 +29,19 @@ def run_chat():
 
         # Sending the full conversation each time provides the context needed
         # to continue the conversation.
-        TotalTokens = 0
-        response = client.messages.create(
-            model='claude-haiku-4-5-20251001',
-            max_tokens=300, # how much words/effort are you willing to pay for this.
-            temperature=0.7, # the lvl from 0 to 1 of predictability and creativity.
-            system=system_message,
-            messages=history
-        )
+        try:
+            response = client.messages.create(
+                model='claude-haiku-4-5-20251001',
+                max_tokens=300, # how much words/effort are you willing to pay for this.
+                temperature=0.7, # the lvl from 0 to 1 of predictability and creativity.
+                system=system_message,
+                messages=history
+            )
+
+
+        except Exception as e:
+            print("Error:", e)
+            continue
         TotalTokens += response.usage.input_tokens + response.usage.output_tokens
         # print(f'Usage: input_tokens={response.usage.input_tokens}, output_tokens={response.usage.output_tokens}') # printing the output and input tokens
 

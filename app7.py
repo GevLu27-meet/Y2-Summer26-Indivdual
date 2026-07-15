@@ -1,4 +1,5 @@
 import os
+from memory import save_history, load_history
 from anthropic import Anthropic
 from dotenv import load_dotenv
 
@@ -24,27 +25,34 @@ def run_chat():
     - End with one follow-up question.
     """
     history = []
-
+    TotalTokens = 0
+    history = load_history()
     print('Trui: Hello! I am Trui, your friendly language instructor. How can I help you today?')
     while True:
-        history = load_history()
         user_input = input('>> ')
 
         if user_input.lower() == 'exit':
+            save_history(history)
             break
         if user_input.lower() == 'reset':
             history = []
             print('Trui: Conversation reset.')
             continue
         history.append({'role': 'user', 'content': user_input})
-        TotalTokens = 0
-        response = client.messages.create(
-            model='claude-haiku-4-5-20251001',
-            max_tokens=300, # how much words/effort are you willing to pay for this.
-            temperature=0.7, # the lvl from 0 to 1 of predictability and creativity.
-            system=system_message,
-            messages=history
-        )
+        
+        try:
+            response = client.messages.create(
+                model='claude-haiku-4-5-20251001',
+                max_tokens=300, # how much words/effort are you willing to pay for this.
+                temperature=0.7, # the lvl from 0 to 1 of predictability and creativity.
+                system=system_message,
+                messages=history
+            )
+
+
+        except Exception as e:
+            print("Error:", e)
+            continue
         TotalTokens += response.usage.input_tokens + response.usage.output_tokens
         
         reply = response.content[0].text
